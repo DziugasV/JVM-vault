@@ -41,7 +41,7 @@ public class EncryptionService {
         
         AEADParameters params = new AEADParameters(
             new KeyParameter(keyBytes),
-            256, 
+            128, 
             nonce,
             null
         );

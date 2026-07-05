@@ -11,7 +11,7 @@ import passwordmanager.src.Backend.DatabaseObject;
 
 public class dbSrc {
 
-    private final String databasePath = "jdbc:sqlite:vault/vault.db";
+    private final String databasePath = "jdbc:sqlite:vault.db";
     // use MySqlLite
 
     public boolean databaseExist(){
@@ -252,11 +252,13 @@ public class dbSrc {
         
        dbSrc db = new dbSrc();
 
-       System.out.println(db.databaseExist());
+       ArrayList<DatabaseObject.AdminData> admin = new ArrayList<>(db.getAdminCredentials());
+       DatabaseObject.AdminData aData = admin.get(0);
+       String username = aData.getUsername();
+       String password = aData.getPassword();
 
-       System.out.println(db.databaseCreate());
-
-       System.out.println(db.databaseExist());
+       System.out.println("Username: " + username);
+       System.out.println("Password: " + password);
 
     }
 

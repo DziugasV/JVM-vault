@@ -8,13 +8,18 @@ import passwordmanager.src.Encryption.HashingService;
 
 public class Comparitor {
 
-    public void justPrintTheValues(String username, char[] passworrd){
+    public void justPrintTheValues(String username, char[] passworrd, char[] key){
         System.out.println("These should be values of input");
         
         System.out.println(username);
         for(int i = 0; i < passworrd.length; i++){
             System.out.print(passworrd[i]);
         }
+        System.out.println();
+        for(int i = 0; i < key.length; i++){
+            System.out.print(key[i]);
+        }
+
     }
 
     //Check for database and make if dosent exist
@@ -38,6 +43,26 @@ public class Comparitor {
         else{
             return false;
         }
+    }
+
+    public boolean isUserCredentialsExists(){
+        
+        boolean flag = false;
+
+        dbSrc database = new dbSrc();
+
+        ArrayList<String> kData = new ArrayList<>(database.getKeyValue());
+        ArrayList<DatabaseObject.AdminData> aData = new ArrayList<>(database.getAdminCredentials()); 
+
+        if(aData.size() > 0 && kData.size() > 0){
+            flag = true;
+        }
+        else{
+            flag = false;
+        }
+
+        return flag;
+
     }
 
     //Add users credentials to database and encrypt
@@ -71,6 +96,34 @@ public class Comparitor {
         }
 
         return true;
+    }
+
+    //Veifys addmin credentials
+    public boolean signInValidateCredentials(String username, char[] password){
+
+        boolean flag = false;
+        
+        try{
+            dbSrc database = new dbSrc();
+            HashingService hash = new HashingService();
+            
+            ArrayList<DatabaseObject.AdminData> aData = new ArrayList<>(database.getAdminCredentials());
+            DatabaseObject.AdminData adminData = aData.get(0);
+
+            String storedUsername = adminData.getUsername();
+            String storedPassword = adminData.getPassword();
+
+            if(storedUsername.equals(username) && hash.HashDataVerify(password, storedPassword)){
+                flag = true;
+            }
+        }
+        finally{
+            if(password != null){
+                java.util.Arrays.fill(password, '\0');
+            }
+        }
+
+        return flag;
     }
 
     //Adds data to vault db
