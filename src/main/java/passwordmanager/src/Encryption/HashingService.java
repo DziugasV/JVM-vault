@@ -39,12 +39,13 @@ public class HashingService {
         finally{
             java.util.Arrays.fill(password, '\0');
             java.util.Arrays.fill(passwordBytes, (byte) 0);
-            java.util.Arrays.fill(hash, (byte) 0);
         }
 
         String encodeSalt = java.util.Base64.getEncoder().encodeToString(salt);
         String encodeHash = java.util.Base64.getEncoder().encodeToString(hash);
         
+        java.util.Arrays.fill(hash, (byte) 0);
+
         return encodeSalt + ":" + encodeHash;
     }
 

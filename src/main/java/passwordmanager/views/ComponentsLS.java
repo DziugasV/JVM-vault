@@ -26,6 +26,7 @@ public class ComponentsLS implements ActionListener, DocumentListener{
 
     private JTextField usernameField = new JTextField();
     private JPasswordField passwordField = new JPasswordField();
+    private JPasswordField keyField = new JPasswordField();
     private JLabel returnMsg = new JLabel();
     private JButton button;
 
@@ -34,8 +35,22 @@ public class ComponentsLS implements ActionListener, DocumentListener{
     private int gapSize = 15;
     private boolean validateUsernamme = false;
     private boolean validatePassword = false;
+    private boolean validateKeyPhrase = false;
     
-    public JButton addButton(String text, Container container){
+    //Gether methods
+    public String getUsername(){
+        return usernameField.getText();
+    }
+
+    public char[] getPassword(){
+        return passwordField.getPassword();
+    }
+
+    public char[] getKey(){
+        return keyField.getPassword();
+    }
+
+    public JButton addButton(String text, Container container, ActionListener lisiner){
         
         button = new JButton();
 
@@ -47,7 +62,7 @@ public class ComponentsLS implements ActionListener, DocumentListener{
         button.setForeground(Color.black);
         button.setText(text);
         button.setFont(new Font("Sarif", Font.PLAIN, 14));
-        button.addActionListener(this);
+        button.addActionListener(lisiner);
 
         container.add(button);
         container.add(Box.createRigidArea(new Dimension(gapSize, gapSize)));
@@ -82,6 +97,21 @@ public class ComponentsLS implements ActionListener, DocumentListener{
         new GhostText(passwordField, "Password");
 
         container.add(passwordField);
+        container.add(Box.createRigidArea(new Dimension(gapSize, gapSize)));
+    }
+
+     public void keyTextField(Container container){
+
+        //Set up key text field
+        keyField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        keyField.setHorizontalAlignment(JTextField.CENTER);
+        keyField.setMaximumSize(new Dimension(width, height));
+        keyField.setOpaque(false);
+
+        //add ghost text
+        new GhostText(keyField, "Key Phrase");
+
+        container.add(keyField);
         container.add(Box.createRigidArea(new Dimension(gapSize, gapSize)));
     }
 
@@ -163,6 +193,10 @@ public class ComponentsLS implements ActionListener, DocumentListener{
         usernameField.getDocument().addDocumentListener(this);
     }
 
+    public void addDocEventToKey(){
+        keyField.getDocument().addDocumentListener(this);
+    }
+
     public void addDocFilterUsername(){
         
         Document doc = usernameField.getDocument();
@@ -185,6 +219,17 @@ public class ComponentsLS implements ActionListener, DocumentListener{
         }
     }
 
+    public void addDocFillterKey(){
+
+        Document doc = keyField.getDocument();
+
+        if(doc instanceof AbstractDocument){
+
+            AbstractDocument aDoc = (AbstractDocument) doc;
+            aDoc.setDocumentFilter(new InputFilter());
+        }
+    }
+
     //Get input data
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -193,8 +238,9 @@ public class ComponentsLS implements ActionListener, DocumentListener{
         if (e.getSource() == button) {
             String username = usernameField.getText();
             char[] password = passwordField.getPassword();
+            char[] key = keyField.getPassword();
 
-            c.justPrintTheValues(username, password);
+            c.justPrintTheValues(username, password, key);
         }
     }
     
@@ -207,7 +253,7 @@ public class ComponentsLS implements ActionListener, DocumentListener{
 
     //Eneble disable button based on parameters
     public boolean buttonUpdate(){
-        if(validatePassword && validateUsernamme){
+        if(validatePassword && validateUsernamme && validateKeyPhrase){
             return true;
         }
         else{
@@ -219,7 +265,7 @@ public class ComponentsLS implements ActionListener, DocumentListener{
     public void validateInputPass(DocumentEvent e){
 
         Document eDoc = e.getDocument();
-        String pass = "";
+        String pass = ""; //Chars
 
         try {
             pass = eDoc.getText(0, eDoc.getLength());
@@ -278,11 +324,35 @@ public class ComponentsLS implements ActionListener, DocumentListener{
         }
     }
 
+    public void validateInputKey(DocumentEvent e){
+
+        Document eDoc = e.getDocument();
+        String key = "";
+
+        try {
+            key = eDoc.getText(0, eDoc.getLength());
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+        
+        if(eDoc == keyField.getDocument()){
+            if(eDoc.getLength() >= 3){
+                validateKeyPhrase = true;
+                returnMsg.setText(null);
+            }
+            else{
+                validateKeyPhrase = false;
+                returnMsg.setText("This phrase will be how you get your password secured");
+            }
+        }
+    }
+
     //Displayes messege to user about input validation
     @Override   
     public void insertUpdate(DocumentEvent e) {
         validateInputPass(e);
         validateInputUsername(e);
+        validateInputKey(e);
         buttonRefresh();
     }
 
@@ -290,12 +360,14 @@ public class ComponentsLS implements ActionListener, DocumentListener{
     public void removeUpdate(DocumentEvent e) {
         validateInputPass(e);
         validateInputUsername(e);
+        validateInputKey(e);
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
         validateInputPass(e);
         validateInputUsername(e);
+        validateInputKey(e);
     }
 
 }

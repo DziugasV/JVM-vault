@@ -2,18 +2,21 @@ package passwordmanager.views;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import passwordmanager.src.Backend.Comparitor;
 
 //Main frame of the app, all Components go here
 public class MainFrame extends JFrame{
     
-    boolean checkPanelsValue = false;
-    JPanel cPanel;
-    CardLayout cardLoader = new CardLayout();
+    public boolean checkPanelsValue = false;
+    public JPanel cPanel;
+    public CardLayout cardLoader = new CardLayout();
+    public static final int WIDTH = 400;
+    public static final int HEIGHT = 500;
+    public Comparitor backend = new Comparitor();
 
     private void setupCardPanel(){
 
@@ -33,8 +36,7 @@ public class MainFrame extends JFrame{
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.getContentPane().setBackground(Color.DARK_GRAY);
-        this.setSize(400, 500);
-        this.setResizable(false);
+        this.setSize(WIDTH * 2, HEIGHT);
         this.setLocationRelativeTo(null);
         this.setTitle("JVM Vault");
         this.add(cPanel);
@@ -45,11 +47,18 @@ public class MainFrame extends JFrame{
             e.printStackTrace();
         }
 
-        if(checkPanelsValue == false){
+        //Determen what frame to use
+        boolean isDatabaseExist = false;
+        boolean isUserCredentialsExist = false;
+
+        isDatabaseExist = backend.databaseVerify();
+        isUserCredentialsExist = backend.isUserCredentialsExists();
+
+        if(isDatabaseExist == true && isUserCredentialsExist == true){
             cardLoader.show(cPanel, "SignInPanel");
         }
-        if(checkPanelsValue == true){
-            cardLoader.show(cPanel, "");
+        if(isDatabaseExist == true && isUserCredentialsExist == false){
+            cardLoader.show(cPanel, "SignUpPanel");    
         }
 
         this.setVisible(true);
@@ -64,8 +73,9 @@ public class MainFrame extends JFrame{
 class SignInPanel extends JPanel implements ActionListener {
 
     private MainFrame mFrame;
-    private JButton button = new JButton();
+    private JButton button;
     private ComponentsLS c = new ComponentsLS();
+    private Comparitor comparitor = new Comparitor();
 
     SignInPanel(MainFrame main){
 
@@ -78,17 +88,21 @@ class SignInPanel extends JPanel implements ActionListener {
         c.addAppName(this);
         c.addSignInDescription(this);
         c.usernameTextField(this);
-        //DocEventUserName Wrong
         c.passwordTextField(this);
-        //DocEventPassword Wrong
-        c.addButton("Sign in", this);
+        this.button = c.addButton("Sign in", this, this);
     }
 
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == button) {
-            System.out.println("Login Login Login");
+        if (e.getSource() == this.button) {
+            
+            if(comparitor.signInValidateCredentials(c.getUsername(), c.getPassword()) == true){
+                mFrame.cardLoader.show(mFrame.cPanel, "DashboardPanel");
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Incorect Username or Password");
+            }
         }
     }
 
@@ -101,6 +115,7 @@ class SignUpPanel extends JPanel implements ActionListener {
     private MainFrame mFrame;
     private JButton button;
     private ComponentsLS c = new ComponentsLS();
+    private Comparitor comparitor = new Comparitor();
 
     SignUpPanel(MainFrame main){
         //Get mainFrame cardswitching
@@ -110,13 +125,16 @@ class SignUpPanel extends JPanel implements ActionListener {
 
         c.addDocFilterUsername();
         c.addDocFilterPassword();
+        c.addDocFillterKey();
         c.addAppName(this);
         c.addRegisterDescription(this);
         c.usernameTextField(this);
         c.addDocEventToName();
         c.passwordTextField(this);
         c.addDocEventToPass();
-        this.button = c.addButton("Sign up", this);
+        c.keyTextField(this);
+        c.addDocEventToKey();
+        this.button = c.addButton("Sign up", this, this);
         c.returnMsg(this);
         c.buttonRefresh();
     }
@@ -125,7 +143,19 @@ class SignUpPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == button) {
-            mFrame.cardLoader.show(mFrame.cPanel, "SignInPanel");
+
+            String user = c.getUsername();
+            char[] pass = c.getPassword();
+            char[] key = c.getKey();
+
+            if(comparitor.singUpDataHandeling(user, pass, key)){
+                JOptionPane.showMessageDialog(this, "Acount created!");
+                mFrame.cardLoader.show(mFrame.cPanel, "SignInPanel");
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Opps failed to create acount!");
+            }
+            
         } 
     }
 
@@ -135,17 +165,16 @@ class DashboardPanel extends JPanel implements ActionListener{
 
     private MainFrame mFrame;
     private JButton button = new JButton();
-    private ComponentsLS c = new ComponentsLS();
+    private ComponentsDash c = new ComponentsDash();
 
     DashboardPanel(MainFrame main){
 
         this.mFrame = main;
         this.setBackground(Color.WHITE);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setLayout(new BorderLayout());
 
-        //Sign up page 
-        JTextField text = new JTextField("DASHBOARD");
-        mFrame.add(text);
+        this.add(c.tableOfContents(), BorderLayout.WEST);
+        
     }
     
     @Override
