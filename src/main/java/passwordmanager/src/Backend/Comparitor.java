@@ -158,41 +158,4 @@ public class Comparitor {
         
     }
 
-    /*
-        Gaunu username ir password string ir char
-        Man reikia abu juos hasint
-        kai hash pavyksta man reikia ji nusiust i db 
-        is hash ir db turi buti 2 trues kad pavyko 
-        tada galiu nusiusti i log in panel is sign in panel
-    */
-
-    // char[] or byte[] should be zeroed out after use
-
-    /*  Sign up
-
-        get user info from Sign up
-        turn password and username to char[]
-        turn password and username to byte[char size]
-        send password and username to hash algo
-        get password and username hash to a string
-        send the hash values to db for storage
-    */
-
-    /*  Log in
-
-        get user input
-        turn password and username to char[]
-        turn password and username to byte[char size]
-        send password and username to hash algo
-        get the new hash value compare whit old hash value
-        send result true or falst if matched
-        true or flase password and username seperate should give 2 values
-        if password or username wrong give pop up try again
-        (time limit the input amounts ????)
-    */
-
-    /*
-        Main vault of password
-        something something no fucking clue
-    */
 }
