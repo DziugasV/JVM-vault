@@ -36,10 +36,11 @@ public class MainFrame extends JFrame{
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.getContentPane().setBackground(Color.DARK_GRAY);
-        this.setSize(WIDTH * 2, HEIGHT);
+        this.setSize(WIDTH, HEIGHT);
         this.setLocationRelativeTo(null);
         this.setTitle("JVM Vault");
         this.add(cPanel);
+        this.setResizable(false);
         
         try {
             this.setIconImage(ImageIO.read(getClass().getResource("assets/key.png")));       
@@ -60,6 +61,8 @@ public class MainFrame extends JFrame{
         if(isDatabaseExist == true && isUserCredentialsExist == false){
             cardLoader.show(cPanel, "SignUpPanel");    
         }
+
+        cardLoader.show(cPanel, "DashboardPanel");
 
         this.setVisible(true);
     }
@@ -166,14 +169,23 @@ class DashboardPanel extends JPanel implements ActionListener{
     private MainFrame mFrame;
     private JButton button = new JButton();
     private ComponentsDash c = new ComponentsDash();
+    private JPanel topPanel = c.topComponents();
+    private JPanel bottomPanel = c.bottomComponent();
 
     DashboardPanel(MainFrame main){
 
         this.mFrame = main;
         this.setBackground(Color.WHITE);
-        this.setLayout(new BorderLayout());
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        this.add(c.tableOfContents(), BorderLayout.WEST);
+        topPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        topPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        bottomPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        bottomPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        this.add(topPanel);
+        this.add(bottomPanel);
         
     }
     
