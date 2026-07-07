@@ -2,5 +2,6 @@
 target/
 *.jar
 *.war
+*.db
 
 .vscode/
